@@ -25,11 +25,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Course> allCourses;
   var formKey = GlobalKey<FormState>();
   double average = 0;
+  TextEditingController textController;
 
   @override
   void initState() {
     super.initState();
     allCourses = [];
+    textController = TextEditingController();
   }
 
   @override
@@ -42,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           if (formKey.currentState.validate()) {
             formKey.currentState.save();
+            textController.text = "";
           }
         },
       ),
@@ -67,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   children: [
                     TextFormField(
+                      controller: textController,
                       style: TextStyle(color: Colors.white),
                       validator: (value) {
                         if (value.length > 0) {
