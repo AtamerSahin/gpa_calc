@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -26,6 +25,8 @@ class _MyHomePageState extends State<MyHomePage> {
   var formKey = GlobalKey<FormState>();
   double average = 0;
   TextEditingController textController;
+  static int counter = 0;
+  var _sKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -37,14 +38,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _sKey,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orange[800],
-        child: Icon(Icons.add),
+        backgroundColor: Colors.orange,
+        child: Icon(Icons.plus_one),
         onPressed: () {
           if (formKey.currentState.validate()) {
             formKey.currentState.save();
             textController.text = "";
+            _sKey.currentState.showSnackBar(SnackBar(
+                backgroundColor: Colors.orange[800],
+                duration: Duration(seconds: 2),
+                content: Text(
+                  "Course added!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                )));
           }
         },
       ),
@@ -76,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         if (value.length > 0) {
                           return null;
                         } else {
-                          return "Course name cannot be blank";
+                          return "Course name cannot be blank!";
                         }
                       },
                       onSaved: (savedValue) {
@@ -84,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         setState(() {
                           allCourses.add(
                               Course(_courseName, _courseScore, _courseCredit));
+                          average = 0;
+                          calculateAvg();
                         });
                       },
                       decoration: InputDecoration(
@@ -131,27 +143,44 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                     Container(
-                      decoration: BoxDecoration(
-                          border: BorderDirectional(
-                              top: BorderSide(
-                                  color: Colors.orange[800], width: 2),
-                              bottom: BorderSide(
-                                  color: Colors.orange[800], width: 2))),
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Center(
-                          child: Text(
-                        "Average: ",
-                        style: TextStyle(color: Colors.white),
-                      )),
-                      height: 70,
-                    ),
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: BorderDirectional(
+                                top: BorderSide(
+                                    color: Colors.orange[800], width: 2),
+                                bottom: BorderSide(
+                                    color: Colors.orange[800], width: 2))),
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(
+                            child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                        text: allCourses.length == 0
+                                            ? ""
+                                            : "Average: ",
+                                        style: TextStyle(fontSize: 16)),
+                                    TextSpan(
+                                        text: allCourses.length == 0
+                                            ? "No course added!"
+                                            : "${average.toStringAsFixed(2)}",
+                                        style: TextStyle(fontSize: 16)),
+                                  ],
+                                  //       child: Text(
+                                  //     "Average: ",
+                                  //     style: TextStyle(color: Colors.white),
+                                  //   )),
+                                  //   height: 70,
+                                  // ),
 
-                    // Divider(
-                    //   indent: MediaQuery.of(context).size.height / 32,
-                    //   height: MediaQuery.of(context).size.height / 8,
-                    //   color: Colors.white,
-                    //   endIndent: MediaQuery.of(context).size.height / 32,
-                    // ),
+                                  // Divider(
+                                  //   indent: MediaQuery.of(context).size.height / 32,
+                                  //   height: MediaQuery.of(context).size.height / 8,
+                                  //   color: Colors.white,
+                                  //   endIndent: MediaQuery.of(context).size.height / 32,
+                                  // ),
+                                )))),
                   ],
                 )),
           ),
@@ -227,13 +256,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _createListElements(BuildContext context, int index) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      child: ListTile(
-          title: Text(allCourses[index].name),
-          subtitle: Text(allCourses[index].credit.toString() + " Credit")),
+    counter++;
+    print(counter);
+    return Dismissible(
+      key: Key(counter.toString()),
+      onDismissed: (dismiss) {
+        setState(() {
+          allCourses.removeAt(index);
+          print(allCourses.length.toString() + "s");
+          calculateAvg();
+        });
+      },
+      direction: DismissDirection.endToStart,
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        child: ListTile(
+            leading: CircleAvatar(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                child: Icon(Icons.school_outlined)),
+            title: Text(allCourses[index].name),
+            subtitle: Text(allCourses[index].credit.toString() + " ECTS")),
+      ),
     );
+  }
+
+  void calculateAvg() {
+    double allScore = 0;
+    double allCredit = 0;
+
+    for (var currentCourse in allCourses) {
+      var credit = currentCourse.credit;
+      var score = currentCourse.score;
+
+      allScore = allScore + (score * credit);
+      allCredit = allCredit + credit;
+    }
+    average = allScore / allCredit;
   }
 }
 
