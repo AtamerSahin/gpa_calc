@@ -38,40 +38,48 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _sKey,
-      resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orange,
-        child: Icon(Icons.plus_one),
-        onPressed: () {
-          if (formKey.currentState.validate()) {
-            formKey.currentState.save();
-            textController.text = "";
-            _sKey.currentState.showSnackBar(SnackBar(
-                backgroundColor: Colors.orange[800],
-                duration: Duration(seconds: 2),
-                content: Text(
-                  "Course added!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
-                )));
-          }
-        },
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.orange[800],
-        title: Text("GPACalc"),
-      ),
-      body: appBody(),
-    );
+        key: _sKey,
+        resizeToAvoidBottomInset: false,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.orange,
+          child: Icon(Icons.plus_one),
+          onPressed: () {
+            if (formKey.currentState.validate()) {
+              formKey.currentState.save();
+              textController.text = "";
+              _sKey.currentState.showSnackBar(SnackBar(
+                  backgroundColor: Colors.orange[800],
+                  duration: Duration(seconds: 2),
+                  content: Text(
+                    "Course added!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  )));
+            }
+          },
+        ),
+        appBar: AppBar(
+          backgroundColor: Colors.orange[800],
+          title: Text("GPACalc"),
+        ),
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            if (orientation == Orientation.portrait) {
+              return appBody(orientation);
+            } else {
+              return appBodyLandscape();
+            }
+          },
+        ));
   }
 
-  Widget appBody() {
+  Widget appBody(var orientation) {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           //. STATIC FORM CONTAINER
+
           Container(
             padding: EdgeInsets.all(10),
             color: Colors.blue[900],
@@ -294,6 +302,137 @@ class _MyHomePageState extends State<MyHomePage> {
       allCredit = allCredit + credit;
     }
     average = allScore / allCredit;
+  }
+
+  //. Landscape
+
+  Widget appBodyLandscape() {
+    return Container(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              color: Colors.blue[900],
+              child: Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: textController,
+                        style: TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value.length > 0) {
+                            return null;
+                          } else {
+                            return "Course name cannot be blank!";
+                          }
+                        },
+                        onSaved: (savedValue) {
+                          _courseName = savedValue;
+                          setState(() {
+                            allCourses.add(Course(
+                                _courseName, _courseScore, _courseCredit));
+                            average = 0;
+                            calculateAvg();
+                          });
+                        },
+                        decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(color: Colors.white)),
+                            hintText: "Course Name",
+                            hintStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20))),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: DropdownButton<int>(
+                              dropdownColor: Colors.blue[800],
+                              items: courseCreditItems(),
+                              value: _courseCredit,
+                              onChanged: (selectedCredit) {
+                                setState(() {
+                                  _courseCredit = selectedCredit;
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: DropdownButton<double>(
+                              dropdownColor: Colors.blue[800],
+                              items: courseScoresItems(),
+                              value: _courseScore,
+                              onChanged: (selectedCourseScore) {
+                                setState(() {
+                                  _courseScore = selectedCourseScore;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                              border: BorderDirectional(
+                                  top: BorderSide(
+                                      color: Colors.orange[800], width: 2),
+                                  bottom: BorderSide(
+                                      color: Colors.orange[800], width: 2))),
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          child: Center(
+                              child: RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                          text: allCourses.length == 0
+                                              ? ""
+                                              : "Average: ",
+                                          style: TextStyle(fontSize: 16)),
+                                      TextSpan(
+                                          text: allCourses.length == 0
+                                              ? "No course added!"
+                                              : "${average.toStringAsFixed(2)}",
+                                          style: TextStyle(fontSize: 16)),
+                                    ],
+                                    //       child: Text(
+                                    //     "Average: ",
+                                    //     style: TextStyle(color: Colors.white),
+                                    //   )),
+                                    //   height: 70,
+                                    // ),
+
+                                    // Divider(
+                                    //   indent: MediaQuery.of(context).size.height / 32,
+                                    //   height: MediaQuery.of(context).size.height / 8,
+                                    //   color: Colors.white,
+                                    //   endIndent: MediaQuery.of(context).size.height / 32,
+                                    // ),
+                                  )))),
+                    ],
+                  )),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text("Form and Result"),
+          ),
+        ],
+      ),
+    );
   }
 }
 
