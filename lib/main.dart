@@ -426,9 +426,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
             ),
           ),
+          //. DYNAMIC LIST CONTAINER
           Expanded(
-            flex: 1,
-            child: Text("Form and Result"),
+            child: Container(
+              color: Colors.blue[900],
+              child: ListView.builder(
+                itemBuilder: _createListElements,
+                itemCount: allCourses.length,
+              ),
+            ),
           ),
         ],
       ),
