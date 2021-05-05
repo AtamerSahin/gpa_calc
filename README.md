@@ -13,9 +13,9 @@ Ders ekleyip çıkararak yılsonu ortalamınızı hesap edebileceğiniz bir Flut
 ###### Screenshots
 
 
-<img src="images/screenshot.png" width="300">
-<img src="images/screenshot2.png" width="300">
-<img src="images/screenshot3.png" width="300">
+<img src="images/screenshot.png" width="300"> <img src="images/screenshot2.png" width="300"> <img src="images/screenshot3.png" width="300">
+
+
 
 
 
