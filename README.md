@@ -4,7 +4,7 @@ A Flutter project that can calculate your GPA by adding and removing courses. Us
 
 # GPACalc
 
-Ders ekleyip çıkararak yılsonu ortalamınızı hesap edebileceğiniz bir Flutter projesi. Uygulamayı Landscape modunda kullanabilmek için OrientationBuilder kullanılmıştır.
+Ders ekleyip çıkararak yılsonu ortalamınızı hesap edebileceğiniz bir Flutter projesi. Uygulamayı Landscape modunda kullanabilmek için OrientationBuilder kullanıldı.
 
 
 
